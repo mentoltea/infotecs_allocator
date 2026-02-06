@@ -61,6 +61,8 @@ void* page_alloc(Page* page, size_t size) {
 
             element_before_min = prev_start;
             element_after_min = next_start;
+            
+            if (free_room_size == fullsize) break;
         }
 
         if (next_start == NULL) break;

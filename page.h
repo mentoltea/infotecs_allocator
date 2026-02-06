@@ -1,18 +1,8 @@
-#ifndef ALLOCATOR_H
-#define ALLOCATOR_H
+#ifndef PAGE_H
+#define PAGE_H
 
 #include "base.h"
-#include <string.h> // for memcpy
 #include <stdbool.h>
-
-// macros for dynamic arrays
-// from my own project https://github.com/mentoltea/cutils
-#define CUTILS_DARRAY_ALLOCATOR crossplatform_alloc
-#define CUTILS_DARRAY_DEALLOCATOR crossplatform_free
-#define CUTILS_DARRAY_MEMCPY memcpy
-#define CUTILS_DARRAY_DEFAULT_SIZE 10
-#define CUTILS_DARRAY_DEFAULT_EXPANSION 2.0
-#include "darray.h"
 
 typedef struct ElementMetainfo {
     struct ElementMetainfo *next;
@@ -40,4 +30,4 @@ void* page_alloc(Page* page, size_t size);
 size_t page_available_max(Page* page);
 void page_free(Page* page, void* addr);
 
-#endif // ALLOCATOR_H
+#endif // PAGE_H
