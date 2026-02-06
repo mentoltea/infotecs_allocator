@@ -21,7 +21,8 @@ void crossplatform_free(void* addr) {
 #ifdef _WIN32 // Windows
     VirtualFree(addr, 0, MEM_RELEASE);
 #else // Unix
-    size_t alloc_size = *((size_t*)addr - 1);
-    munmap(addr, alloc_size);
+    size_t* head = (size_t*)addr - 1;
+    size_t alloc_size = *head;
+    munmap(head, alloc_size);
 #endif
 }
