@@ -7,8 +7,11 @@ typedef struct Pages {
 } Pages;
 
 static Pages pages = {0};
+static pthread_mutex_t pages_mutex = PTHREAD_MUTEX_INITIALIZER;
 
 void* malloc(size_t size) {
+    pthread_mutex_lock(&pages_mutex);
+
     size_t fullsize = size + sizeof(ElementMetainfo);
     Page* min_page = NULL;
     size_t min_size = SIZE_MAX;
@@ -26,25 +29,37 @@ void* malloc(size_t size) {
         if (page_init(min_page, page_size) == false) return NULL;
         da_append(pages, *min_page);
     }
-    return page_alloc(min_page, size);
+    
+    void* data = page_alloc(min_page, size);
+
+    pthread_mutex_unlock(&pages_mutex);
+
+    return data;
 }
 
 void free(void* addr) {
+    pthread_mutex_lock(&pages_mutex);
     for (int idx = 0; idx < pages.count; idx++) {
         Page *page = &pages.items[idx]; 
         if (addr >= page->start && addr < page->start + page->size) {
             page_free(page, addr);
+            pthread_mutex_unlock(&pages_mutex);
             return;
         }
     }
+    pthread_mutex_unlock(&pages_mutex);
     // addres not in current pages (ignore?)
 }
 
 void mreset() {
+    pthread_mutex_lock(&pages_mutex);
+
     for (int idx = 0; idx < pages.count; idx++) {
         Page *page = &pages.items[idx];
         page_destroy(page);
     }
     crossplatform_free(pages.items);
     pages.count = 0;
+
+    pthread_mutex_unlock(&pages_mutex);
 }

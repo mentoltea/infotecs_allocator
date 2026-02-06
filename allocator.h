@@ -4,6 +4,8 @@
 #include "base.h"
 #include "page.h"
 
+#include <pthread.h> // for mutexes
+
 #define PAGE_SIZE 4096
 
 #include <string.h> // for memcpy
@@ -16,7 +18,14 @@
 #define CUTILS_DARRAY_DEFAULT_EXPANSION 2.0
 #include "darray.h"
 
+// @note
+// On Unix, do not malloc or free in child after `fork`
+// as it may lead to dereference of invalid pointers
 void* malloc(size_t size);
+
+// @note
+// On Unix, do not malloc or free in child after `fork`
+// as it may lead to dereference of invalid pointers
 void free(void* addr);
 
 // Resets (clears) page system.
